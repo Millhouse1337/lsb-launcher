@@ -1,6 +1,8 @@
 import { app } from 'electron';
 import { join } from 'path';
 
+export const ASHITA_PROFILE = 'lsb';
+
 export function getResourcesPath(): string {
   return app.isPackaged ? process.resourcesPath : join(app.getAppPath(), 'resources');
 }
@@ -17,6 +19,10 @@ export function getAshitaRoot(): string {
   return join(getResourcesPath(), 'ashita');
 }
 
+export function getAshitaExePath(): string {
+  return join(getAshitaRoot(), 'Ashita-cli.exe');
+}
+
 export function getAshitaAddonsDir(): string {
   return join(getAshitaRoot(), 'addons');
 }
@@ -26,5 +32,9 @@ export function getAshitaPluginsDir(): string {
 }
 
 export function getAshitaBootConfigPath(profile: string): string {
-  return join(getAshitaRoot(), 'config', 'boot', `${profile}.xml`);
+  return join(getAshitaRoot(), 'config', 'boot', `${profile}.ini`);
+}
+
+export function getAshitaScriptPath(profile: string): string {
+  return join(getAshitaRoot(), 'scripts', `${profile}.txt`);
 }

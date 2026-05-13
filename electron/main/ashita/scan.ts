@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
 import { getAshitaAddonsDir, getAshitaPluginsDir } from '../paths';
 import { parseAddonMetadata } from './metadata';
-import { getEnabledScripts } from './config';
+import { getEnabledScripts } from './script';
 
 export interface AddonInfo {
   name: string;

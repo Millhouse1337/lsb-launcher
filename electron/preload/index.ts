@@ -21,6 +21,10 @@ const api = {
     openAddonsFolder: () => ipcRenderer.invoke('ashita:openAddonsFolder'),
     openPluginsFolder: () => ipcRenderer.invoke('ashita:openPluginsFolder'),
   },
+  ffxi: {
+    getSettings: () => ipcRenderer.invoke('ffxi:getSettings'),
+    setSettings: (partial: unknown) => ipcRenderer.invoke('ffxi:setSettings', partial),
+  },
 };
 
 contextBridge.exposeInMainWorld('api', api);

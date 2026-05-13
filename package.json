@@ -15,10 +15,7 @@
     "dist": "electron-vite build && electron-builder",
     "dist:dir": "electron-vite build && electron-builder --dir"
   },
-  "dependencies": {
-    "fast-xml-parser": "^4.5.0",
-    "winreg": "^1.2.5"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@mantine/core": "^7.13.0",
     "@mantine/hooks": "^7.13.0",
@@ -26,7 +23,6 @@
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "@types/winreg": "^1.2.36",
     "@vitejs/plugin-react": "^4.3.2",
     "electron": "^32.0.0",
     "electron-builder": "^25.0.5",

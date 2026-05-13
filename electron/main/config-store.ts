@@ -5,13 +5,11 @@ import { join } from 'path';
 export interface LauncherConfig {
   serverHost: string;
   serverPort: number;
-  ashitaProfile: string;
 }
 
 const DEFAULTS: LauncherConfig = {
   serverHost: '127.0.0.1',
   serverPort: 8088,
-  ashitaProfile: 'default',
 };
 
 let cached: LauncherConfig | null = null;
@@ -40,7 +38,8 @@ export function getConfig(): LauncherConfig {
 
 export function updateConfig(patch: Partial<LauncherConfig>): LauncherConfig {
   const current = getConfig();
-  cached = { ...current, ...patch };
-  writeFileSync(configPath(), JSON.stringify(cached, null, 2), 'utf-8');
-  return cached;
+  const next: LauncherConfig = { ...current, ...patch };
+  cached = next;
+  writeFileSync(configPath(), JSON.stringify(next, null, 2), 'utf-8');
+  return next;
 }

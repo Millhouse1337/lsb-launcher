@@ -1,21 +1,28 @@
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { getXiloaderDir, getXiloaderPath } from '../paths';
+import { ASHITA_PROFILE, getAshitaExePath, getAshitaRoot, getXiloaderPath } from '../paths';
 import { getConfig } from '../config-store';
+import { setServerHost } from '../ashita/boot';
 
 export async function launchGame(): Promise<void> {
-  const exe = getXiloaderPath();
-  if (!existsSync(exe)) {
+  const ashitaExe = getAshitaExePath();
+  if (!existsSync(ashitaExe)) {
     throw new Error(
-      `xiloader.exe not found at ${exe}. Place a build of xiloader in the resources/xiloader directory and rebuild.`
+      `Ashita-cli.exe not found at ${ashitaExe}. Extract Ashita v4 into resources/ashita/ so Ashita-cli.exe is at the root.`
+    );
+  }
+  if (!existsSync(getXiloaderPath())) {
+    throw new Error(
+      `xiloader.exe not found at ${getXiloaderPath()}. Drop the LandSandBoat xiloader release in resources/xiloader/.`
     );
   }
 
+  // Sync server host into the boot INI so Ashita passes the right --server to xiloader.
   const cfg = getConfig();
-  // We pass --server as a hint; xiloader forks differ in supported flags, so the
-  // bundled xiloader's xiloader.ini is the source of truth. Document this in README.
-  const child = spawn(exe, ['--server', cfg.serverHost], {
-    cwd: getXiloaderDir(),
+  setServerHost(ASHITA_PROFILE, cfg.serverHost);
+
+  const child = spawn(ashitaExe, [ASHITA_PROFILE], {
+    cwd: getAshitaRoot(),
     detached: true,
     stdio: 'ignore',
   });

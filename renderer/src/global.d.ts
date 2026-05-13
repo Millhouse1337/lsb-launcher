@@ -24,7 +24,18 @@ interface PluginInfo {
 interface LauncherConfig {
   serverHost: string;
   serverPort: number;
-  ashitaProfile: string;
+}
+
+interface FFXISettings {
+  windowWidth?: number;
+  windowHeight?: number;
+  soundEnabled?: boolean;
+  hardwareMouse?: boolean;
+  showOpeningMovie?: boolean;
+  gamma?: number;
+  maxSounds?: number;
+  windowMode?: 0 | 1 | 3;
+  soundAlwaysOn?: boolean;
 }
 
 interface LauncherApi {
@@ -45,6 +56,10 @@ interface LauncherApi {
     togglePlugin: (name: string, enabled: boolean) => Promise<void>;
     openAddonsFolder: () => Promise<string>;
     openPluginsFolder: () => Promise<string>;
+  };
+  ffxi: {
+    getSettings: () => Promise<FFXISettings>;
+    setSettings: (partial: Partial<FFXISettings>) => Promise<void>;
   };
 }
 
