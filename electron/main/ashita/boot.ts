@@ -41,16 +41,30 @@ const BOOLEAN_KEYS: ReadonlySet<keyof FFXISettings> = new Set<keyof FFXISettings
   'soundAlwaysOn',
 ]);
 
+// Ashita's INI parser treats a backslash as an escape character, so every path value
+// must be written DOUBLED in the resulting .ini. See the Ashita-shipped example at
+// resources/ashita/config/boot/example-privateserver.ini (`file = .\\bootloader\\pol.exe`).
+// ini.ts writes values verbatim, so the doubling has to survive this template literal.
+const XILOADER_RELATIVE_PATH = '..\\\\xiloader\\\\xiloader.exe';
+
 const TEMPLATE = `; LSB Launcher boot profile
 ; The launcher edits specific keys but leaves other lines untouched, so feel free
 ; to add additional Ashita config sections below.
 
+[ashita.launcher]
+autoclose   = 1
+name        = LSB
+
 [ashita.boot]
-file        = ..\\xiloader\\xiloader.exe
+file        = ${XILOADER_RELATIVE_PATH}
 command     = --server 127.0.0.1
 gamemodule  = FFXiMain.dll
 script      = lsb.txt
 args        =
+
+[ashita.language]
+playonline  = 2
+ashita      = 2
 
 [ffxi.registry]
 `;
