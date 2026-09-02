@@ -7,8 +7,13 @@ export interface LauncherConfig {
   serverPort: number;
 }
 
+// Change this to the real server host before building installers for testers, or every
+// tester connects to their own machine. Exported so the UI can warn loudly rather than
+// letting it fail silently at the xiloader console.
+export const UNCONFIGURED_SERVER_HOST = '127.0.0.1';
+
 const DEFAULTS: LauncherConfig = {
-  serverHost: '127.0.0.1',
+  serverHost: UNCONFIGURED_SERVER_HOST,
   serverPort: 8088,
 };
 

@@ -25,7 +25,10 @@ win:
 nsis:
   oneClick: false
   perMachine: false
-  allowToChangeInstallationDirectory: true
+  # The launcher writes its Ashita profile inside its own install dir, so it must land
+  # somewhere writable. Letting a tester choose C:\Program Files makes Play fail
+  # with an EPERM on first launch.
+  allowToChangeInstallationDirectory: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: LSB Launcher
