@@ -3,6 +3,7 @@ import { existsSync } from 'fs';
 import { ASHITA_PROFILE, getAshitaExePath, getAshitaRoot, getXiloaderPath } from '../paths';
 import { getConfig } from '../config-store';
 import { setServerHost } from '../ashita/boot';
+import { ensureScriptFile } from '../ashita/script';
 
 export async function launchGame(): Promise<void> {
   const ashitaExe = getAshitaExePath();
@@ -20,6 +21,10 @@ export async function launchGame(): Promise<void> {
   // Sync server host into the boot INI so Ashita passes the right --server to xiloader.
   const cfg = getConfig();
   setServerHost(ASHITA_PROFILE, cfg.serverHost);
+
+  // The boot INI references script = lsb.txt. If that file has never been written,
+  // Ashita loads no plugins and no addons at all -- including LSM.
+  ensureScriptFile(ASHITA_PROFILE);
 
   const child = spawn(ashitaExe, [ASHITA_PROFILE], {
     cwd: getAshitaRoot(),

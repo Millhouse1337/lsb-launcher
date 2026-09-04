@@ -23,7 +23,36 @@ function lineToString(line: ScriptLine): string {
   return line.type === 'addon' ? `/addon load ${line.name}` : `/load ${line.name}`;
 }
 
+// Seeded the first time the script file is needed. This is not cosmetic: without
+// `/load addons` Ashita cannot load ANY Lua addon, so an unseeded profile launches the
+// game with the LSM addon silently absent and no clue as to why. Stock Ashita's
+// scripts/default.txt opens with the same two /load lines.
+const DEFAULT_SCRIPT_LINES = [
+  '# LSB Launcher boot script.',
+  '#',
+  '# Managed by the Extensions tab: toggling an addon or plugin there adds or removes',
+  '# its load line below. Anything else you add here is preserved.',
+  '',
+  '# Required before any Lua addon can load.',
+  '/load thirdparty',
+  '/load addons',
+  '',
+  '# Linkshell Manager addon.',
+  '/addon load lsm',
+  '',
+];
+
+// Exported so the launch path can guarantee the file exists even when a tester never
+// opens the Extensions tab.
+export function ensureScriptFile(profile: string): void {
+  const path = getAshitaScriptPath(profile);
+  if (existsSync(path)) return;
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, DEFAULT_SCRIPT_LINES.join('\r\n'), 'utf-8');
+}
+
 function readScriptFile(profile: string): ScriptLine[] {
+  ensureScriptFile(profile);
   const path = getAshitaScriptPath(profile);
   if (!existsSync(path)) return [];
   return readFileSync(path, 'utf-8').split(/\r?\n/).map(parseLine);

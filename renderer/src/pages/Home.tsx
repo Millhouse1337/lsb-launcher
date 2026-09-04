@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Badge, Button, Card, Group, Loader, Stack, Text, Title } from '@mantine/core';
-import { IconCircleFilled, IconPlayerPlay } from '@tabler/icons-react';
+import { Alert, Badge, Button, Card, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { IconAlertTriangle, IconCircleFilled, IconPlayerPlay } from '@tabler/icons-react';
+
+// Mirrors UNCONFIGURED_SERVER_HOST in electron/main/config-store.ts. A tester who never
+// changes this connects to their own machine and gets a confusing xiloader failure, so
+// say so up front rather than letting Play look like it is broken.
+const LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '::1'];
 
 export default function Home() {
   const [status, setStatus] = useState<ServerStatus | null>(null);
+  const [config, setConfig] = useState<LauncherConfig | null>(null);
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState<string | null>(null);
 
@@ -14,9 +20,12 @@ export default function Home() {
 
   useEffect(() => {
     refresh();
+    window.api.config.get().then(setConfig);
     const id = setInterval(refresh, 30_000);
     return () => clearInterval(id);
   }, []);
+
+  const serverUnconfigured = config !== null && LOOPBACK_HOSTS.includes(config.serverHost);
 
   async function play() {
     setLaunching(true);
@@ -33,6 +42,18 @@ export default function Home() {
   return (
     <Stack mt="xl" gap="lg">
       <Title order={2}>Welcome</Title>
+      {serverUnconfigured && (
+        <Alert
+          color="yellow"
+          icon={<IconAlertTriangle size={18} />}
+          title="No server configured"
+          variant="light"
+        >
+          The server host is still <strong>{config?.serverHost}</strong>, which points at your own
+          computer. Open <strong>Settings</strong> and enter the server address you were given, or
+          the game will fail to connect.
+        </Alert>
+      )}
       <Card withBorder padding="lg" radius="md">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group>
