@@ -58,22 +58,37 @@ export default function Settings() {
     <Stack mt="xl" gap="lg">
       <Title order={2}>Settings</Title>
 
+      {/*
+        Advanced on purpose. The installer already ships pointing at the right server, so a tester
+        never has to touch either of these -- and changing them is how you end up unable to
+        connect with no idea why. They stay editable rather than hidden because they are also the
+        only way back if the server ever moves.
+      */}
       <Card withBorder padding="lg" radius="md">
-        <Title order={4} mb="md">
-          Server
+        <Title order={4} mb="xs">
+          Server (advanced)
         </Title>
+        <Text size="sm" c="dimmed" mb="md">
+          Already set up for you. Only change these if you have been asked to.
+        </Text>
         <Stack>
           <TextInput
             label="Server host"
-            description="The IP or hostname of your LSB server."
+            description="The IP or hostname of the LSB server."
             value={config.serverHost}
             onChange={(e) => patchConfig('serverHost', e.currentTarget.value)}
           />
+          {/*
+            The LOGIN port, not an HTTP API. The status badge opens a TCP connection to it to
+            answer "is the server up" -- it used to GET an HTTP API on 8088 that is not running,
+            so the badge was permanently red. The label still said "HTTP API port ... Default
+            8088" after that changed, which described neither what the field is nor what it holds.
+          */}
           <NumberInput
-            label="HTTP API port"
-            description="Used for status polling. Default 8088."
+            label="Login port"
+            description="Used to check whether the server is up. Default 54231."
             value={config.serverPort}
-            onChange={(v) => patchConfig('serverPort', typeof v === 'number' ? v : 8088)}
+            onChange={(v) => patchConfig('serverPort', typeof v === 'number' ? v : 54231)}
             min={1}
             max={65535}
           />

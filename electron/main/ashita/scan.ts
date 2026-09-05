@@ -29,20 +29,26 @@ export function scanAddons(profile: string): AddonInfo[] {
   return readdirSync(dir)
     .filter((name) => {
       try {
-        return statSync(join(dir, name)).isDirectory();
+        if (!statSync(join(dir, name)).isDirectory()) return false;
       } catch {
         return false;
       }
+      // An addon is a folder holding <name>.lua -- that file IS what `/addon load <name>`
+      // loads, so a folder without one cannot be loaded at all.
+      //
+      // Being a directory was the whole test, which listed every folder that happens to sit in
+      // the addons directory. Ashita's own addon collection ships a `.vscode` folder, so the
+      // launcher offered editor settings as an addon -- and enabling it would have written a
+      // `/addon load .vscode` line that fails silently at boot.
+      return existsSync(join(dir, name, `${name}.lua`));
     })
     .map((name) => {
       const luaPath = join(dir, name, `${name}.lua`);
       let meta = {};
-      if (existsSync(luaPath)) {
-        try {
-          meta = parseAddonMetadata(readFileSync(luaPath, 'utf-8'));
-        } catch {
-          // ignore parse errors
-        }
+      try {
+        meta = parseAddonMetadata(readFileSync(luaPath, 'utf-8'));
+      } catch {
+        // Unreadable or malformed header: still a real addon, just one we cannot describe.
       }
       return {
         name,
