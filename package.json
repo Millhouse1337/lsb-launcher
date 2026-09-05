@@ -1,6 +1,6 @@
 {
   "name": "lsb-launcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "A user-friendly launcher for LandSandBoat FFXI servers",
   "author": "Mill House",
