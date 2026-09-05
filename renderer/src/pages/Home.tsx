@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Alert, Badge, Button, Card, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Alert, Badge, Button, Card, Group, Image, Loader, Stack, Text, Title } from '@mantine/core';
 import { IconAlertTriangle, IconCircleFilled, IconPlayerPlay } from '@tabler/icons-react';
+// Imported rather than referenced by path so Vite fingerprints it into the bundle -- a bare
+// /src path resolves in dev and 404s in the packaged app, where the renderer is served from
+// file://.
+import bannerImage from '../assets/lsm-test-server.png';
 
 // Mirrors UNCONFIGURED_SERVER_HOST in electron/main/config-store.ts. A tester who never
 // changes this connects to their own machine and gets a confusing xiloader failure, so
@@ -55,6 +59,16 @@ export default function Home() {
         </Alert>
       )}
       <Card withBorder padding="lg" radius="md">
+        {/* Sits above the status row and Play, so the card leads with what this launcher IS
+            before it reports on it. Fixed aspect via the natural size; width:100% lets it
+            shrink with the window rather than forcing a horizontal scrollbar. */}
+        <Image
+          src={bannerImage}
+          alt="LSM Test Server"
+          radius="md"
+          mb="lg"
+          style={{ width: '100%', height: 'auto' }}
+        />
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group>
             {status === null ? (

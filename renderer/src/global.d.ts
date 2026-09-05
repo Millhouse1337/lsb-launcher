@@ -1,3 +1,8 @@
+/// <reference types="vite/client" />
+// Gives TypeScript the module declarations for asset imports (png/jpg/svg/...), which Vite
+// resolves to a fingerprinted URL string at build time. Without this an `import banner from
+// './x.png'` is a compile error even though the bundler handles it fine.
+
 interface ServerStatus {
   online: boolean;
   sessions?: number;

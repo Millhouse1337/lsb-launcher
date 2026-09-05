@@ -1,5 +1,5 @@
 appId: com.millhouse.lsblauncher
-productName: LSB Launcher
+productName: LSMTestServer
 copyright: Copyright (C) 2026 Mill House
 directories:
   buildResources: build
