@@ -1,10 +1,15 @@
 import { app } from 'electron';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import type { FFXISettings } from './ashita/boot';
 
 export interface LauncherConfig {
   serverHost: string;
   serverPort: number;
+  // Ashita rewrites config/boot/lsb.ini when the game exits, resetting every [ffxi.registry]
+  // key to -1 ("no override"). That wipes whatever the Graphics tab last saved, so the
+  // launcher keeps its own copy here and writes it back into the INI before every launch.
+  ffxi: FFXISettings;
 }
 
 // The test server testers connect to unless they change it in the launcher. This is what a
@@ -26,6 +31,7 @@ export const UNCONFIGURED_SERVER_HOST = '127.0.0.1';
 const DEFAULTS: LauncherConfig = {
   serverHost: DEFAULT_SERVER_HOST,
   serverPort: DEFAULT_SERVER_PORT,
+  ffxi: {},
 };
 
 let cached: LauncherConfig | null = null;

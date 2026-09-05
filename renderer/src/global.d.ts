@@ -29,6 +29,7 @@ interface PluginInfo {
 interface LauncherConfig {
   serverHost: string;
   serverPort: number;
+  ffxi: FFXISettings;
 }
 
 interface FFXISettings {
@@ -65,6 +66,8 @@ interface LauncherApi {
   ffxi: {
     getSettings: () => Promise<FFXISettings>;
     setSettings: (partial: Partial<FFXISettings>) => Promise<void>;
+    padConfigAvailable: () => Promise<boolean>;
+    openPadConfig: () => Promise<void>;
   };
 }
 

@@ -31,4 +31,4 @@ nsis:
   allowToChangeInstallationDirectory: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: LSB Launcher
+  shortcutName: LSManagerTestServer

@@ -24,6 +24,8 @@ const api = {
   ffxi: {
     getSettings: () => ipcRenderer.invoke('ffxi:getSettings'),
     setSettings: (partial: unknown) => ipcRenderer.invoke('ffxi:setSettings', partial),
+    padConfigAvailable: () => ipcRenderer.invoke('ffxi:padConfigAvailable'),
+    openPadConfig: () => ipcRenderer.invoke('ffxi:openPadConfig'),
   },
 };
 

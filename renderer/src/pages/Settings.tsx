@@ -10,7 +10,6 @@ import {
   Stack,
   Switch,
   Text,
-  TextInput,
   Title,
 } from '@mantine/core';
 
@@ -21,19 +20,24 @@ const WINDOW_MODE_OPTIONS = [
 ];
 
 export default function Settings() {
-  const [config, setConfig] = useState<LauncherConfig | null>(null);
   const [ffxi, setFfxi] = useState<FFXISettings | null>(null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [padConfigAvailable, setPadConfigAvailable] = useState(false);
+  const [padError, setPadError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.api.config.get().then(setConfig);
     window.api.ffxi.getSettings().then(setFfxi);
+    window.api.ffxi.padConfigAvailable().then(setPadConfigAvailable);
   }, []);
 
-  function patchConfig<K extends keyof LauncherConfig>(key: K, value: LauncherConfig[K]) {
-    setConfig((c) => (c ? { ...c, [key]: value } : c));
-    setDirty(true);
+  async function openPadConfig() {
+    setPadError(null);
+    try {
+      await window.api.ffxi.openPadConfig();
+    } catch (err) {
+      setPadError(err instanceof Error ? err.message : String(err));
+    }
   }
 
   function patchFfxi<K extends keyof FFXISettings>(key: K, value: FFXISettings[K]) {
@@ -42,58 +46,21 @@ export default function Settings() {
   }
 
   async function save() {
-    if (!config || !ffxi) return;
+    if (!ffxi) return;
     setSaving(true);
     try {
-      await Promise.all([window.api.config.update(config), window.api.ffxi.setSettings(ffxi)]);
+      await window.api.ffxi.setSettings(ffxi);
       setDirty(false);
     } finally {
       setSaving(false);
     }
   }
 
-  if (!config || !ffxi) return null;
+  if (!ffxi) return null;
 
   return (
     <Stack mt="xl" gap="lg">
       <Title order={2}>Settings</Title>
-
-      {/*
-        Advanced on purpose. The installer already ships pointing at the right server, so a tester
-        never has to touch either of these -- and changing them is how you end up unable to
-        connect with no idea why. They stay editable rather than hidden because they are also the
-        only way back if the server ever moves.
-      */}
-      <Card withBorder padding="lg" radius="md">
-        <Title order={4} mb="xs">
-          Server (advanced)
-        </Title>
-        <Text size="sm" c="dimmed" mb="md">
-          Already set up for you. Only change these if you have been asked to.
-        </Text>
-        <Stack>
-          <TextInput
-            label="Server host"
-            description="The IP or hostname of the LSB server."
-            value={config.serverHost}
-            onChange={(e) => patchConfig('serverHost', e.currentTarget.value)}
-          />
-          {/*
-            The LOGIN port, not an HTTP API. The status badge opens a TCP connection to it to
-            answer "is the server up" -- it used to GET an HTTP API on 8088 that is not running,
-            so the badge was permanently red. The label still said "HTTP API port ... Default
-            8088" after that changed, which described neither what the field is nor what it holds.
-          */}
-          <NumberInput
-            label="Login port"
-            description="Used to check whether the server is up. Default 54231."
-            value={config.serverPort}
-            onChange={(v) => patchConfig('serverPort', typeof v === 'number' ? v : 54231)}
-            min={1}
-            max={65535}
-          />
-        </Stack>
-      </Card>
 
       <Card withBorder padding="lg" radius="md">
         <Title order={4} mb="md">
@@ -159,6 +126,36 @@ export default function Settings() {
             min={12}
             max={20}
           />
+        </Stack>
+      </Card>
+
+      <Card withBorder padding="lg" radius="md">
+        <Title order={4} mb="xs">
+          Controller
+        </Title>
+        <Text size="sm" c="dimmed" mb="md">
+          Opens FINAL FANTASY XI&apos;s own gamepad config, where you pick your controller and
+          remap its buttons. Windows will ask for permission -- it saves to a system-wide setting
+          the game reads.
+        </Text>
+        <Stack align="flex-start">
+          <Button
+            variant="default"
+            disabled={!padConfigAvailable}
+            onClick={openPadConfig}
+          >
+            Open gamepad config
+          </Button>
+          {!padConfigAvailable && (
+            <Text size="sm" c="dimmed">
+              FINAL FANTASY XI was not found on this PC, so its gamepad config is unavailable.
+            </Text>
+          )}
+          {padError && (
+            <Text size="sm" c="red">
+              {padError}
+            </Text>
+          )}
         </Stack>
       </Card>
 

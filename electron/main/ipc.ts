@@ -6,6 +6,7 @@ import { scanAddons, scanPlugins } from './ashita/scan';
 import { setScriptEnabled } from './ashita/script';
 import { getFFXISettings, setFFXISettings, setServerHost, type FFXISettings } from './ashita/boot';
 import { ASHITA_PROFILE, getAshitaAddonsDir, getAshitaPluginsDir } from './paths';
+import { isPadConfigAvailable, openPadConfig } from './ffxi/tools';
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('config:get', () => getConfig());
@@ -35,8 +36,19 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('ashita:openAddonsFolder', () => shell.openPath(getAshitaAddonsDir()));
   ipcMain.handle('ashita:openPluginsFolder', () => shell.openPath(getAshitaPluginsDir()));
 
-  ipcMain.handle('ffxi:getSettings', () => getFFXISettings(ASHITA_PROFILE));
+  ipcMain.handle('ffxi:padConfigAvailable', () => isPadConfigAvailable());
+  ipcMain.handle('ffxi:openPadConfig', () => openPadConfig());
+
+  ipcMain.handle('ffxi:getSettings', () => {
+    const stored = getConfig().ffxi;
+    // Seed from the INI the first time, so settings saved before the launcher tracked these
+    // itself are not lost. After that the launcher's copy wins -- the INI is Ashita's to clobber.
+    if (Object.keys(stored).length > 0) return stored;
+    return getFFXISettings(ASHITA_PROFILE);
+  });
   ipcMain.handle('ffxi:setSettings', (_e, partial: Partial<FFXISettings>) => {
-    setFFXISettings(ASHITA_PROFILE, partial);
+    const next: FFXISettings = { ...getConfig().ffxi, ...partial };
+    updateConfig({ ffxi: next });
+    setFFXISettings(ASHITA_PROFILE, next);
   });
 }
