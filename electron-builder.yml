@@ -16,6 +16,11 @@ extraResources:
     to: ashita
     filter:
       - "**/*"
+      # The LSM addon's tests and test runner are for developers only. Players never run them,
+      # so they stay out of the installer even though the local addon copy has them.
+      - "!addons/lsm/**/*_test.lua"
+      - "!addons/lsm/run_tests.lua"
+      - "!addons/lsm/TESTING.md"
 win:
   target:
     - target: nsis
